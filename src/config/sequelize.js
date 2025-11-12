@@ -4,7 +4,7 @@ import config from "./config.js";
 const sequelize = new Sequelize({
   dialect: "postgres",
   database: config.DB_NAME,
-  user: config.DB_USER,
+  username: config.DB_USER,
   password: config.DB_PASS,
   host: config.DB_HOST,
   port: config.DB_PORT,
