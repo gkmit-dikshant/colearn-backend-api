@@ -1,18 +1,29 @@
-import js from "@eslint/js";
-import globals from "globals";
-import { defineConfig } from "eslint/config";
-
-export default defineConfig([
+module.exports = [
   {
-    files: ["**/*.{js,mjs,cjs}"],
-    plugins: { js },
-    extends: ["js/recommended"],
-    languageOptions: { globals: globals.browser },
-  },
-
-  {
+    files: ["**/*.js"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "commonjs",
+      globals: {
+        // Add any global variables specific to your CommonJS environment
+      },
+    },
     rules: {
-      "no-unused-vars": "error",
+      // Add your desired ESLint rules here
+      indent: ["error", 2],
+      quotes: ["error", "single"],
+      semi: ["error", "always"],
+      "no-unused-vars": ["warn", { args: "none" }],
+      // ... more rules
+    },
+    // Extend recommended configurations
+    extends: [
+      "eslint:recommended",
+      // Add other shareable configs or plugins if needed,
+    ],
+    // Add plugins if necessary
+    plugins: {
+      // e.g., node: require('eslint-plugin-node')
     },
   },
-]);
+];
