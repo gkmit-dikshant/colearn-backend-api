@@ -6,7 +6,11 @@
   "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "migrate": "sequelize-cli db:migrate",
+    "migrate:undo": "sequelize-cli db:migrate:undo",
+    "model:create": "sequelize-cli model:generate",
+    "migration:create": "sequelize-cli migration:generate"
   },
   "author": "",
   "license": "ISC",
