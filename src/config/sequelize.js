@@ -1,13 +1,13 @@
 import { Sequelize } from "sequelize";
-import config from "./config.js";
+import "dotenv/config";
 
 const sequelize = new Sequelize({
-  dialect: config.DB_DIALECT,
-  database: config.DB_NAME,
-  username: config.DB_USER,
-  password: config.DB_PASS,
-  host: config.DB_HOST,
-  port: config.DB_PORT,
+  dialect: process.env.DB_DIALECT,
+  database: process.env.DB_NAME,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
   timezone: "+05:30",
   pool: {
     max: 20,
