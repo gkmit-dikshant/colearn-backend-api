@@ -1,14 +1,11 @@
 module.exports = [
   {
-    // Applies to all files by default
-    // Or specify files to target, e.g., 'src/**/*.js'
     files: ["**/*.js"],
     languageOptions: {
-      ecmaVersion: 2022, // Or a later version supported by your Node.js environment
+      ecmaVersion: 2022,
       sourceType: "commonjs",
       globals: {
         // Add any global variables specific to your CommonJS environment
-        // e.g., 'module': 'readonly', 'require': 'readonly' if not implicitly handled by 'commonjs' sourceType
       },
     },
     rules: {
@@ -23,7 +20,6 @@ module.exports = [
     extends: [
       "eslint:recommended",
       // Add other shareable configs or plugins if needed,
-      // e.g., for specific frameworks or libraries like 'plugin:node/recommended'
     ],
     // Add plugins if necessary
     plugins: {
