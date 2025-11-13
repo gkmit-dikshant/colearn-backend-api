@@ -2,7 +2,7 @@ import { Sequelize } from "sequelize";
 import config from "./config.js";
 
 const sequelize = new Sequelize({
-  dialect: "postgres",
+  dialect: config.DB_DIALECT,
   database: config.DB_NAME,
   username: config.DB_USER,
   password: config.DB_PASS,
