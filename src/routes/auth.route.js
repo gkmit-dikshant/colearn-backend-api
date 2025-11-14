@@ -3,5 +3,6 @@ const { authController } = require("../controllers");
 const router = express.Router();
 
 router.post("/signup", authController.signup);
+router.post("/verify-otp", authController.verifyOtp);
 
 module.exports = router;

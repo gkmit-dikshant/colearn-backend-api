@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { authService } = require("../services");
+const client = require("../config/redis");
+const { createOtp } = require("../utils/helper");
 
 const createAccessToken = (payload) => {
   const secret = process.env.JWT_SECRET;
@@ -11,16 +13,62 @@ const createAccessToken = (payload) => {
 const signup = async (req, res, next) => {
   const { name, email, password, bio } = req.body;
 
-  try {
-    const user = await authService.signup({
+  // create otp
+  const otp = createOtp();
+
+  // store otp
+  await client.set(
+    email,
+    JSON.stringify({
+      otp,
       name,
       email,
       password,
       bio,
+    }),
+    { EX: 300 }
+  );
+
+  // send email
+  console.log(otp);
+
+  return res.status(201).json({
+    success: true,
+    message: "otp sent successfully",
+  });
+};
+
+const verifyOtp = async (req, res, next) => {
+  const { email, otp } = req.body;
+
+  const user = JSON.parse(await client.get(email));
+  if (!user) {
+    return res.status(403).json({
+      success: false,
+      message: "please signup first",
+    });
+  }
+  if (user.otp !== otp) {
+    return res.status(400).json({
+      success: false,
+      message: "invalid otp",
+    });
+  }
+
+  // create user
+  try {
+    const userField = await authService.signup({
+      name: user.email,
+      email: user.email,
+      password: user.password,
+      bio: user.bio,
     });
 
-    const token = createAccessToken({ id: user.id, email: user.email });
-    return res.status(200).json({
+    const token = createAccessToken({
+      id: userField.id,
+      email: userField.email,
+    });
+    return res.status(201).json({
       success: true,
       token,
     });
@@ -32,4 +80,4 @@ const signup = async (req, res, next) => {
   }
 };
 
-module.exports = { signup };
+module.exports = { signup, verifyOtp };
