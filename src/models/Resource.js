@@ -4,6 +4,10 @@ module.exports = (sequelize, DataTypes) => {
   class Resource extends Model {
     static associate(models) {
       // define association here
+      this.hasMany(models.Permission, {
+        foreignKey: "resource_id",
+        as: "permissions",
+      });
     }
   }
   Resource.init(

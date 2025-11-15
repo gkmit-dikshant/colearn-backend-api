@@ -3,7 +3,10 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Operation extends Model {
     static associate(models) {
-      // define association here
+      this.hasMany(models.Permission, {
+        foreignKey: "operation_id",
+        as: "permissions",
+      });
     }
   }
   Operation.init(
