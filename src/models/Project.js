@@ -14,6 +14,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "project_id",
         as: "project_skills",
       });
+
+      this.hasMany(models.Application, {
+        foreignKey: "project_id",
+        as: "applications",
+      });
     }
   }
   Project.init(
