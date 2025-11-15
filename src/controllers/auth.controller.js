@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const { authService } = require("../services");
 const client = require("../config/redis");
 const { createOtp } = require("../utils/helper");
+const Email = require("../utils/email");
 
 const createAccessToken = (payload) => {
   const secret = process.env.JWT_SECRET;
@@ -12,6 +13,7 @@ const createAccessToken = (payload) => {
 
 const signup = async (req, res, next) => {
   const { name, email, password, bio } = req.body;
+  const otpExpMin = Number(process.env.OTP_EXP_MIN) || 5;
 
   // create otp
   const otp = createOtp();
@@ -26,11 +28,15 @@ const signup = async (req, res, next) => {
       password,
       bio,
     }),
-    { EX: 300 }
+    { EX: otpExpMin * 60 }
   );
 
   // send email
-  console.log(otp);
+  await new Email().send(email, "OTP for Registration | Colearn", "signup-otp", {
+    username: name,
+    otp,
+    expiryMinutes: otpExpMin,
+  });
 
   return res.status(201).json({
     success: true,
@@ -58,7 +64,7 @@ const verifyOtp = async (req, res, next) => {
   // create user
   try {
     const userField = await authService.signup({
-      name: user.email,
+      name: user.name,
       email: user.email,
       password: user.password,
       bio: user.bio,
