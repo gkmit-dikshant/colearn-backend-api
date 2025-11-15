@@ -5,10 +5,22 @@ const { createOtp } = require("../utils/helper");
 const emailHelper = require("../utils/email.helper");
 
 const createAccessToken = (payload) => {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) return new Error("JWT secret is not defined");
+  const secret = process.env.JWT_ACCESS_SECRET;
+  const exp = process.env.JWT_ACCESS_EXP;
+  if (!secret) return new Error("JWT access secret is not found");
+  if (!exp) return new Error("JWT acess exp is not found");
 
-  return jwt.sign(payload, secret);
+  return jwt.sign(payload, secret, { expiresIn: exp });
+};
+
+const createRefreshToken = (payload) => {
+  const exp = process.env.JWT_REFRESH_EXP;
+  const secret = process.env.JWT_REFRESH_SECRET;
+
+  if (!secret) return new Error("JWT refresh secret is not defined");
+  if (!exp) return new Error("JWT refresh exp is not found");
+
+  return jwt.sign(payload, secret, { expiresIn: exp });
 };
 
 const signup = async (req, res, next) => {
@@ -70,13 +82,19 @@ const verifyOtp = async (req, res, next) => {
       bio: user.bio,
     });
 
-    const token = createAccessToken({
+    const refreshToken = createRefreshToken({
       id: userField.id,
       email: userField.email,
     });
+    const accessToken = createAccessToken({
+      id: userField.id,
+      email: userField.email,
+    });
+
     return res.status(201).json({
       success: true,
-      token,
+      refreshToken,
+      accessToken,
     });
   } catch (error) {
     return res.status(400).json({
