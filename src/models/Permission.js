@@ -9,8 +9,13 @@ module.exports = (sequelize, DataTypes) => {
       });
 
       this.belongsTo(models.Resource, {
-        foreignKey: "resouce_id",
+        foreignKey: "resource_id",
         as: "resource",
+      });
+
+      this.hasMany(models.RolePermission, {
+        foreignKey: "permission_id",
+        as: "role_permissions",
       });
     }
   }
