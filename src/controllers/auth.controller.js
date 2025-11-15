@@ -104,4 +104,32 @@ const verifyOtp = async (req, res, next) => {
   }
 };
 
-module.exports = { signup, verifyOtp };
+const login = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await authService.login({ email, password });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: `no user with email ${email}`,
+      });
+    }
+    const accessToken = createAccessToken({ id: user.id, email });
+    const refreshToken = createRefreshToken({ id: user.id, email });
+
+    return res.status(200).json({
+      success: true,
+      accessToken,
+      refreshToken,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { signup, verifyOtp, login };

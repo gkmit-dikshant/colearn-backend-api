@@ -28,6 +28,30 @@ const signup = async (payload) => {
   }
 };
 
+const login = async (payload) => {
+  const { email, password } = payload;
+  if (!email || !password) {
+    const field = missingDetail({ email, password });
+    throw new Error(`please provide ${field}`);
+  }
+
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return null;
+    }
+    if (!(await bcrypt.compare(password, user.password))) {
+      return new Error("invalid credential");
+    }
+
+    return user;
+  } catch (error) {
+    console.log("failed to fetch user with email", error.message);
+    throw error;
+  }
+};
+
 module.exports = {
   signup,
+  login,
 };
