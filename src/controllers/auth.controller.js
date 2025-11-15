@@ -7,8 +7,8 @@ const emailHelper = require("../utils/email.helper");
 const createAccessToken = (payload) => {
   const secret = process.env.JWT_ACCESS_SECRET;
   const exp = process.env.JWT_ACCESS_EXP;
-  if (!secret) return new Error("JWT access secret is not found");
-  if (!exp) return new Error("JWT acess exp is not found");
+  if (!secret) throw new Error("JWT access secret is not found");
+  if (!exp) throw new Error("JWT acess exp is not found");
 
   return jwt.sign(payload, secret, { expiresIn: exp });
 };
@@ -17,10 +17,23 @@ const createRefreshToken = (payload) => {
   const exp = process.env.JWT_REFRESH_EXP;
   const secret = process.env.JWT_REFRESH_SECRET;
 
-  if (!secret) return new Error("JWT refresh secret is not defined");
-  if (!exp) return new Error("JWT refresh exp is not found");
+  if (!secret) throw new Error("JWT refresh secret is not defined");
+  if (!exp) throw new Error("JWT refresh exp is not found");
 
   return jwt.sign(payload, secret, { expiresIn: exp });
+};
+
+const verifyRefreshToken = (email, token) => {
+  const secret = process.env.JWT_REFRESH_SECRET;
+  if (!secret) throw new Error("JWT refresh secret is not defined");
+
+  try {
+    const decoded = jwt.verify(token, secret);
+    return decoded.email === email ? decoded : null;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 };
 
 const signup = async (req, res, next) => {
@@ -132,4 +145,36 @@ const login = async (req, res, next) => {
   }
 };
 
-module.exports = { signup, verifyOtp, login };
+const sendRefreshToken = async (req, res, next) => {
+  const { email, refreshToken } = req.body;
+
+  if (!email) {
+    return res.status(400).json({
+      success: false,
+      message: "please provide email",
+    });
+  }
+  if (!refreshToken) {
+    return res.status(400).json({
+      success: false,
+      message: "please provide password",
+    });
+  }
+
+  const decoded = verifyRefreshToken(email, refreshToken);
+  if (!decoded) {
+    return res.status(401).json({
+      success: false,
+      message: "invalid refresh token, please login agian",
+    });
+  }
+
+  const accessToken = createAccessToken({ id: decoded.id, email: decoded.email });
+
+  return res.status(200).json({
+    success: true,
+    accessToken,
+  });
+};
+
+module.exports = { signup, verifyOtp, login, sendRefreshToken };
