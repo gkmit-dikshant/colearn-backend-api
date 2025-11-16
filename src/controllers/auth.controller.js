@@ -1,40 +1,7 @@
-const jwt = require("jsonwebtoken");
 const { authService } = require("../services");
 const client = require("../config/redis");
-const { createOtp } = require("../utils/helper");
 const emailHelper = require("../utils/email.helper");
-
-const createAccessToken = (payload) => {
-  const secret = process.env.JWT_ACCESS_SECRET;
-  const exp = process.env.JWT_ACCESS_EXP;
-  if (!secret) throw new Error("JWT access secret is not found");
-  if (!exp) throw new Error("JWT acess exp is not found");
-
-  return jwt.sign(payload, secret, { expiresIn: exp });
-};
-
-const createRefreshToken = (payload) => {
-  const exp = process.env.JWT_REFRESH_EXP;
-  const secret = process.env.JWT_REFRESH_SECRET;
-
-  if (!secret) throw new Error("JWT refresh secret is not defined");
-  if (!exp) throw new Error("JWT refresh exp is not found");
-
-  return jwt.sign(payload, secret, { expiresIn: exp });
-};
-
-const verifyRefreshToken = (email, token) => {
-  const secret = process.env.JWT_REFRESH_SECRET;
-  if (!secret) throw new Error("JWT refresh secret is not defined");
-
-  try {
-    const decoded = jwt.verify(token, secret);
-    return decoded.email === email ? decoded : null;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-};
+const { createOtp, createJwtToken, verifyJwtToken } = require("../utils/helper");
 
 const signup = async (req, res, next) => {
   const { name, email, password, bio } = req.body;
@@ -43,6 +10,7 @@ const signup = async (req, res, next) => {
   // create otp
   const otp = createOtp();
 
+  // store data on redis
   const data = {
     otp,
     name,
@@ -70,7 +38,7 @@ const verifyOtp = async (req, res, next) => {
 
   const user = JSON.parse(await client.get(email));
   if (!user) {
-    return res.status(403).json({
+    return res.status(401).json({
       success: false,
       message: "please signup first",
     });
@@ -94,11 +62,11 @@ const verifyOtp = async (req, res, next) => {
       bio: user.bio,
     });
 
-    const refreshToken = createRefreshToken({
+    const refreshToken = createJwtToken("refresh", {
       id: userField.id,
       email: userField.email,
     });
-    const accessToken = createAccessToken({
+    const accessToken = createJwtToken("access", {
       id: userField.id,
       email: userField.email,
     });
@@ -128,8 +96,8 @@ const login = async (req, res, next) => {
         message: `no user with email ${email}`,
       });
     }
-    const accessToken = createAccessToken({ id: user.id, email });
-    const refreshToken = createRefreshToken({ id: user.id, email });
+    const accessToken = createJwtToken("access", { id: user.id, email });
+    const refreshToken = createJwtToken("refresh", { id: user.id, email });
 
     return res.status(200).json({
       success: true,
@@ -144,7 +112,7 @@ const login = async (req, res, next) => {
   }
 };
 
-const sendRefreshToken = async (req, res, next) => {
+const sendAccessToken = async (req, res, next) => {
   const { email, refreshToken } = req.body;
 
   if (!email) {
@@ -160,15 +128,15 @@ const sendRefreshToken = async (req, res, next) => {
     });
   }
 
-  const decoded = verifyRefreshToken(email, refreshToken);
-  if (!decoded) {
+  const currUser = verifyJwtToken("refresh", refreshToken);
+  if (!currUser || currUser.email !== email) {
     return res.status(401).json({
       success: false,
       message: "invalid refresh token, please login agian",
     });
   }
 
-  const accessToken = createAccessToken({ id: decoded.id, email: decoded.email });
+  const accessToken = createJwtToken("access", currUser);
 
   return res.status(200).json({
     success: true,
@@ -176,4 +144,4 @@ const sendRefreshToken = async (req, res, next) => {
   });
 };
 
-module.exports = { signup, verifyOtp, login, sendRefreshToken };
+module.exports = { signup, verifyOtp, login, sendAccessToken };
