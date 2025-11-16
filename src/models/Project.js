@@ -4,13 +4,13 @@ module.exports = (sequelize, DataTypes) => {
   class Project extends Model {
     static associate(models) {
       this.belongsToMany(models.Skill, {
-        through: models.UserSkill,
+        through: models.ProjectSkill,
         foreignKey: "project_id",
         otherKey: "skill_id",
         as: "skills",
       });
 
-      this.hasMany(models.UserSkill, {
+      this.hasMany(models.ProjectSkill, {
         foreignKey: "project_id",
         as: "project_skills",
       });
@@ -18,6 +18,11 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Application, {
         foreignKey: "project_id",
         as: "applications",
+      });
+
+      this.belongsTo(models.Location, {
+        foreignKey: "location_id",
+        as: "location",
       });
     }
   }
