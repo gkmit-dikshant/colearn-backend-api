@@ -43,18 +43,14 @@ const signup = async (req, res, next) => {
   // create otp
   const otp = createOtp();
 
-  // store otp
-  await client.set(
+  const data = {
+    otp,
+    name,
     email,
-    JSON.stringify({
-      otp,
-      name,
-      email,
-      password,
-      bio,
-    }),
-    { EX: otpExpMin * 60 }
-  );
+    password,
+    bio,
+  };
+  await client.set(email, JSON.stringify(data), "EX", otpExpMin * 60);
 
   // send email
   await emailHelper.send(email, "OTP for Registration | Colearn", "signup-otp", {
@@ -85,6 +81,9 @@ const verifyOtp = async (req, res, next) => {
       message: "invalid otp",
     });
   }
+
+  // delete cashe
+  await client.del(email);
 
   // create user
   try {
