@@ -8,6 +8,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "role_id",
         as: "role_permissions",
       });
+
+      this.hasMany(models.ProjectUserRole, {
+        foreignKey: "role_id",
+        as: "project_user_roles",
+      });
     }
   }
   Role.init(
