@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Application.init(
     {
-      id: { type: DataTypes.INTEGER, primaryKey: true },
+      id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       user_id: { type: DataTypes.INTEGER, allowNull: false },
       project_id: { type: DataTypes.INTEGER, allowNull: false },
       status: { type: DataTypes.ENUM("pending", "accepted", "rejected"), defaultValue: "pending" },

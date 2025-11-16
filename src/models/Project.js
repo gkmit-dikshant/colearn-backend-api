@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Project.init(
     {
-      id: { type: DataTypes.INTEGER, primaryKey: true },
+      id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       title: { type: DataTypes.STRING(200), allowNull: false },
       description: { type: DataTypes.TEXT, allowNull: false },
       location_id: { type: DataTypes.INTEGER, allowNull: false },
