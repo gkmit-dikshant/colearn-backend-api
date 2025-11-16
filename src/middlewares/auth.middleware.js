@@ -19,6 +19,15 @@ const authMiddleware = async (req, res, next) => {
     });
   }
 
+  const user = await User.findByPk(currUser.id);
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: `user with email ${currUser.email} does'nt exist`,
+    });
+  }
+
   req.user = currUser;
   next();
 };
