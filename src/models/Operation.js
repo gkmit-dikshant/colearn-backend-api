@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Operation.init(
     {
-      id: { type: DataTypes.INTEGER, primaryKey: true },
+      id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       name: { type: DataTypes.STRING(50), allowNull: false, unique: true },
     },
     {

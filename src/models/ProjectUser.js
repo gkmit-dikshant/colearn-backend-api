@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   ProjectUser.init(
     {
-      id: { type: DataTypes.INTEGER, primaryKey: true },
+      id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       project_id: { type: DataTypes.INTEGER, allowNull: false },
       user_id: { type: DataTypes.INTEGER, allowNull: false },
     },

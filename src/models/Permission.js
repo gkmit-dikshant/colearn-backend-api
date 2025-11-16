@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Permission.init(
     {
-      id: { type: DataTypes.INTEGER, primaryKey: true },
+      id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       operation_id: { type: DataTypes.INTEGER, allowNull: false },
       resource_id: { type: DataTypes.INTEGER, allowNull: false },
     },
