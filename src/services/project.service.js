@@ -108,39 +108,41 @@ const getAllUserProjects = async (userId) => {
   userId = Number(userId);
   if (!userId) throw new Error("userId is required");
 
-  const projects = await ProjectUser.findAll({
+  const rows = await ProjectUser.findAll({
     where: { user_id: userId },
+    attributes: [], // don’t need project_user fields
     include: [
       {
         model: Project,
         as: "project",
-        attributes: ["id", "title", "description", "location_id", "status"],
+        attributes: ["id", "title", "description", "status"],
         include: [
-          {
-            model: Skill,
-            as: "skills",
-            attributes: ["id", "name"],
-            through: { attributes: [] },
-          },
           {
             model: Location,
             as: "location",
-            attributes: ["id", "descriptions"],
+            attributes: ["descriptions"],
           },
-        ],
-      },
-      {
-        model: ProjectUserRole,
-        as: "project_user_roles",
-        include: [
           {
-            model: Role,
-            as: "role",
-            attributes: ["id", "name"],
+            model: Skill,
+            through: { model: ProjectSkill },
+            as: "skills",
+            attributes: ["name"],
           },
         ],
       },
     ],
+  });
+
+  const projects = rows.map((row) => {
+    const p = row.project;
+    return {
+      id: p.id,
+      title: p.title,
+      description: p.description,
+      status: p.status,
+      location: p.location?.descriptions || null,
+      skills: p.skills?.map((s) => s.name) || [],
+    };
   });
 
   return projects;
@@ -148,11 +150,12 @@ const getAllUserProjects = async (userId) => {
 
 const getAllProjects = async () => {
   const projects = await Project.findAll({
+    attributes: ["id", "title", "description"],
     include: [
       {
         model: Location,
         as: "location",
-        attributes: ["id", "descriptions"],
+        attributes: ["descriptions"],
       },
       {
         model: Skill,
@@ -162,6 +165,7 @@ const getAllProjects = async () => {
       },
     ],
   });
+
   return projects;
 };
 

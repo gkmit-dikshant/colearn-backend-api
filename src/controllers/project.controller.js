@@ -23,7 +23,7 @@ const createProject = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: "Project created successfully",
-      data: project,
+      project,
     });
   } catch (error) {
     next(error);
@@ -37,7 +37,7 @@ const getAllProjects = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Projects retrieved successfully",
-      data: projects,
+      projects,
       count: projects.length,
     });
   } catch (error) {
@@ -52,7 +52,7 @@ const getAllUserProjects = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Projects retrieved successfully",
-      data: projects,
+      projects,
       count: projects.length,
     });
   } catch (error) {
@@ -76,7 +76,7 @@ const getProject = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Project retrieved successfully",
-      data: project,
+      project,
     });
   } catch (error) {
     if (error.statusCode === 404) {
