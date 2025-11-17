@@ -41,7 +41,7 @@ const getProjectRole = async (req, res, next) => {
       include: [{ model: Role, as: "role" }],
     });
 
-    req.user.role = projectUserRole?.role?.name || "viewer";
+    req.user.role = projectUserRole.role.name;
 
     return next();
   } catch (error) {
