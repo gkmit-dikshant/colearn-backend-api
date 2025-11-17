@@ -28,7 +28,6 @@ const getProjectApplications = async (req, res, next) => {
   }
 };
 
-// 3️⃣ Approve or reject
 const updateStatus = async (req, res, next) => {
   try {
     const applicationId = req.params.applicationId;
@@ -50,7 +49,6 @@ const updateStatus = async (req, res, next) => {
   }
 };
 
-// 4️⃣ Get my own applications
 const getMyApplications = async (req, res, next) => {
   try {
     const userId = req.user.id;

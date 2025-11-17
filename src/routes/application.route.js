@@ -8,13 +8,13 @@ const router = express.Router();
 router.use(auth);
 
 router.post(
-  "/:projectId",
+  "/projects/:projectId",
   getProjectRole,
   protected("viewer", "member", "owner"),
   applicationController.applyToProject
 );
 
-router.get("/projects/:projectId", getProjectRole(), protected("owner"), applicationController.getProjectApplications);
+router.get("/projects/:projectId", getProjectRole, protected("owner"), applicationController.getProjectApplications);
 
 router.post("/status/:applicationId", getProjectRole, protected("owner"), applicationController.updateStatus);
 

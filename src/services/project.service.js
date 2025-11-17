@@ -15,7 +15,6 @@ const createProject = async (projectData) => {
   try {
     const { owner_id, title, description, location_id, status, skill_ids } = projectData;
 
-    // 1. create
     const project = await Project.create(
       {
         title,
@@ -26,17 +25,15 @@ const createProject = async (projectData) => {
       { transaction }
     );
 
-    // 2. create project skills
     if (Array.isArray(skill_ids) && skill_ids.length > 0) {
-      const projectSkills = skill_ids.map((skill_id) => ({
+      const skills = skill_ids.map((skill_id) => ({
         project_id: project.id,
         skill_id,
       }));
 
-      await ProjectSkill.bulkCreate(projectSkills, { transaction });
+      await ProjectSkill.bulkCreate(skills, { transaction });
     }
 
-    // 3. add project owner
     const projectUser = await ProjectUser.create(
       {
         user_id: owner_id,
@@ -50,11 +47,8 @@ const createProject = async (projectData) => {
       transaction,
     });
 
-    if (!ownerRole) {
-      throw new Error("Owner role not found. Seed roles first.");
-    }
+    if (!ownerRole) throw new Error("Owner role not seeded");
 
-    // 4. create project user role
     await ProjectUserRole.create(
       {
         project_user_id: projectUser.id,
@@ -65,7 +59,7 @@ const createProject = async (projectData) => {
 
     await transaction.commit();
 
-    return await Project.findByPk(project.id, {
+    const newProject = await Project.findByPk(project.id, {
       include: [
         {
           model: Location,
@@ -102,6 +96,8 @@ const createProject = async (projectData) => {
         },
       ],
     });
+
+    return newProject;
   } catch (error) {
     if (!transaction.finished) await transaction.rollback();
     throw error;
@@ -109,25 +105,60 @@ const createProject = async (projectData) => {
 };
 
 const getAllUserProjects = async (userId) => {
-  if (!userId) {
-    throw new Error("userId is not defined in getAllUserProject");
-  }
+  userId = Number(userId);
+  if (!userId) throw new Error("userId is required");
+
   const projects = await ProjectUser.findAll({
-    where: { user_id: parseInt(userId) },
+    where: { user_id: userId },
     include: [
       {
         model: Project,
         as: "project",
         attributes: ["id", "title", "description", "location_id", "status"],
+        include: [
+          {
+            model: Skill,
+            as: "skills",
+            attributes: ["id", "name"],
+            through: { attributes: [] },
+          },
+          {
+            model: Location,
+            as: "location",
+            attributes: ["id", "descriptions"],
+          },
+        ],
       },
       {
         model: ProjectUserRole,
         as: "project_user_roles",
-        include: {
-          model: Role,
-          as: "role",
-          attributes: ["id", "name"],
-        },
+        include: [
+          {
+            model: Role,
+            as: "role",
+            attributes: ["id", "name"],
+          },
+        ],
+      },
+    ],
+  });
+
+  return projects;
+};
+
+const getAllProjects = async () => {
+  const projects = await Project.findAll({
+    include: [
+      {
+        model: Location,
+        as: "location",
+        attributes: ["id", "descriptions"],
+      },
+      {
+        model: Skill,
+        as: "skills",
+        attributes: ["id", "name"],
+        through: { attributes: [] },
       },
     ],
   });
@@ -163,5 +194,6 @@ const getProjectById = async (projectId) => {
 module.exports = {
   createProject,
   getAllUserProjects,
+  getAllProjects,
   getProjectById,
 };

@@ -1,6 +1,30 @@
 const { Application, ProjectUser, ProjectUserRole, Project, Role, User } = require("../models");
 
 const applyToProject = async (userId, projectId, message) => {
+  const owner = await ProjectUser.findOne({
+    where: {
+      user_id: userId,
+      project_id: projectId,
+    },
+    include: [
+      {
+        model: ProjectUserRole,
+        as: "project_user_roles",
+        include: [
+          {
+            model: Role,
+            as: "role",
+            where: { name: "owner" },
+          },
+        ],
+      },
+    ],
+  });
+
+  if (owner) {
+    throw new Error("You cannot apply to your own project");
+  }
+
   const existing = await Application.findOne({
     where: { user_id: userId, project_id: projectId },
   });
@@ -9,14 +33,12 @@ const applyToProject = async (userId, projectId, message) => {
     throw new Error("You have already applied to this project");
   }
 
-  const application = await Application.create({
+  return await Application.create({
     user_id: userId,
     project_id: projectId,
     message,
     status: "pending",
   });
-
-  return application;
 };
 
 const getProjectApplications = async (projectId) => {

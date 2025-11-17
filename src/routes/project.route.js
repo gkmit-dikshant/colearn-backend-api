@@ -10,7 +10,7 @@ router.get("/me", projectController.getAllUserProjects);
 router.get("/", projectController.getAllProjects);
 router.get(
   "/:projectId",
-  rbacMiddleware.getProjectRole(),
+  rbacMiddleware.getProjectRole,
   rbacMiddleware.protected("member", "owner"),
   projectController.getProject
 );

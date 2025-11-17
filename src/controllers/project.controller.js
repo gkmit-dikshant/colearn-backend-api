@@ -4,7 +4,6 @@ const createProject = async (req, res, next) => {
   try {
     const { title, description, location_id, status, skill_ids } = req.body;
 
-    // Basic validation
     if (!title || !description || !location_id) {
       return res.status(400).json({
         success: false,
@@ -33,14 +32,7 @@ const createProject = async (req, res, next) => {
 
 const getAllProjects = async (req, res, next) => {
   try {
-    const filters = {
-      status: req.query.status,
-      location_id: req.query.location_id,
-    };
-
-    Object.keys(filters).forEach((key) => filters[key] === undefined && delete filters[key]);
-
-    const projects = await projectService.getAllProjects(filters);
+    const projects = await projectService.getAllProjects();
 
     res.status(200).json({
       success: true,
