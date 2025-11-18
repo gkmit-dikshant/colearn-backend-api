@@ -144,4 +144,22 @@ const sendAccessToken = async (req, res, next) => {
   });
 };
 
-module.exports = { signup, verifyOtp, login, sendAccessToken };
+const getLoginUserDetails = async (req, res, next) => {
+  const userId = req.user.id;
+
+  try {
+    const user = await authService.getUserDetails(userId);
+
+    return res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { signup, verifyOtp, login, sendAccessToken, getLoginUserDetails };

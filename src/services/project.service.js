@@ -72,28 +72,6 @@ const createProject = async (projectData) => {
           attributes: ["id", "name"],
           through: { attributes: [] },
         },
-        {
-          model: ProjectUser,
-          as: "project_users",
-          include: [
-            {
-              model: User,
-              as: "user",
-              attributes: ["id", "name", "email"],
-            },
-            {
-              model: ProjectUserRole,
-              as: "project_user_roles",
-              include: [
-                {
-                  model: Role,
-                  as: "role",
-                  attributes: ["id", "name"],
-                },
-              ],
-            },
-          ],
-        },
       ],
     });
 

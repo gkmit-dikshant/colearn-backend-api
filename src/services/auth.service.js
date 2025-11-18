@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const { User, sequelize } = require("../models");
+const { User, Skill, UserSkill, sequelize } = require("../models");
 
 const missingDetail = (data) => {
   for (const key in data) {
@@ -51,7 +51,19 @@ const login = async (payload) => {
   }
 };
 
+const getUserDetails = async (userId) => {
+  if (!userId) {
+    throw new Error("no user id provide for user details");
+  }
+  const user = await User.findByPk(userId, {
+    attributes: ["id", "name", "email", "bio"],
+  });
+
+  return user;
+};
+
 module.exports = {
   signup,
   login,
+  getUserDetails,
 };
