@@ -7,15 +7,27 @@ const {
 
 const ApplicationService = require("../src/services/application.service");
 
-const { mockRequest, mockResponse } = require("./mocks/mockReqRes");
-
-// mock
 jest.mock("../src/services/application.service", () => ({
   applyToProject: jest.fn(),
   getProjectApplications: jest.fn(),
   updateStatus: jest.fn(),
   getMyApplications: jest.fn(),
 }));
+
+jest.mock("../src/services/project.service", () => ({
+  getProjectOwner: jest.fn().mockResolvedValue({ email: "owner@mail.com" }),
+  getProjectById: jest.fn().mockResolvedValue({ id: 10, title: "Test Project" }),
+}));
+
+jest.mock("../src/services/auth.service", () => ({
+  getUserDetails: jest.fn().mockResolvedValue({ id: 99, name: "John" }),
+}));
+
+jest.mock("../src/utils/email.helper", () => ({
+  send: jest.fn(),
+}));
+
+const { mockRequest, mockResponse } = require("./mocks/mockReqRes");
 
 describe("applyToProject() Unit Test", () => {
   it("should apply to project successfully", async () => {
