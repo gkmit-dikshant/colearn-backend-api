@@ -2,11 +2,12 @@ const jwt = require("jsonwebtoken");
 
 const createOtp = () => {
   let len = Number(process.env.OTP_LEN) || 4;
+  if (len < 4) throw new Error("invalid otp length in env");
   let otp = "";
   while (len--) {
     otp += Math.floor(Math.random() * 10);
   }
-  return Number(otp);
+  return otp;
 };
 
 const createJwtToken = (type, payload) => {

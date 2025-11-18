@@ -9,7 +9,7 @@ const missingDetail = (data) => {
 
 const signup = async (payload) => {
   const { name, email, password, bio } = payload;
-  if (!name || !email || !password || !bio) {
+  if (!name || !email || !password) {
     const field = missingDetail({ name, email, password });
     throw new Error(`please provide ${field}`);
   }
