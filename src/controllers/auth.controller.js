@@ -43,7 +43,6 @@ const verifyOtp = async (req, res, next) => {
       message: "please signup first",
     });
   }
-  console.log(user.otp, otp);
   if (user.otp !== otp) {
     return res.status(400).json({
       success: false,
