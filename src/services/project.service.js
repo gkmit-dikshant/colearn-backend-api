@@ -88,7 +88,7 @@ const getAllUserProjects = async (userId) => {
 
   const rows = await ProjectUser.findAll({
     where: { user_id: userId },
-    attributes: [], // don’t need project_user fields
+    attributes: [],
     include: [
       {
         model: Project,
