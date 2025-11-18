@@ -165,9 +165,7 @@ const getProjectById = async (projectId) => {
   });
 
   if (!project) {
-    const error = new Error("Project not found");
-    error.statusCode = 404;
-    throw error;
+    throw new Error("Project not found");
   }
 
   return project;

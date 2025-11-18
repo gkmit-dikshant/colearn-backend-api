@@ -41,7 +41,7 @@ const login = async (payload) => {
       return null;
     }
     if (!(await bcrypt.compare(password, user.password))) {
-      return new Error("invalid credential");
+      throw new Error("invalid credential");
     }
 
     return user;
