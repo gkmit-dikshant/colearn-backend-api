@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const { User, sequelize } = require("../models");
+const { User, Skill, UserSkill, sequelize } = require("../models");
 
 const missingDetail = (data) => {
   for (const key in data) {
@@ -9,7 +9,7 @@ const missingDetail = (data) => {
 
 const signup = async (payload) => {
   const { name, email, password, bio } = payload;
-  if (!name || !email || !password || !bio) {
+  if (!name || !email || !password) {
     const field = missingDetail({ name, email, password });
     throw new Error(`please provide ${field}`);
   }
@@ -41,7 +41,7 @@ const login = async (payload) => {
       return null;
     }
     if (!(await bcrypt.compare(password, user.password))) {
-      return new Error("invalid credential");
+      throw new Error("invalid credential");
     }
 
     return user;
@@ -51,7 +51,19 @@ const login = async (payload) => {
   }
 };
 
+const getUserDetails = async (userId) => {
+  if (!userId) {
+    throw new Error("no user id provide for user details");
+  }
+  const user = await User.findByPk(userId, {
+    attributes: ["id", "name", "email", "bio"],
+  });
+
+  return user;
+};
+
 module.exports = {
   signup,
   login,
+  getUserDetails,
 };

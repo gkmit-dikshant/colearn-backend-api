@@ -5,7 +5,6 @@ const protected = (...roles) => {
     if (roles.includes(req.user.role)) {
       return next();
     }
-
     return res.status(403).json({
       success: false,
       message: "You're not allowed to access this service",
@@ -15,9 +14,8 @@ const protected = (...roles) => {
 
 const getProjectRole = async (req, res, next) => {
   try {
-    const userId = req.user.id;
-    const projectId = req.params.projectId;
-
+    const userId = parseInt(req.user.id);
+    const projectId = parseInt(req.params.projectId);
     const project = await Project.findOne({
       where: { id: projectId },
     });
