@@ -13,7 +13,7 @@ const {
 const createProject = async (projectData) => {
   const transaction = await sequelize.transaction();
   try {
-    const { owner_id, title, description, location_id, status, skill_ids } = projectData;
+    const { owner_id, title, description, location_id, status, skills } = projectData;
 
     const project = await Project.create(
       {
@@ -25,13 +25,13 @@ const createProject = async (projectData) => {
       { transaction }
     );
 
-    if (Array.isArray(skill_ids) && skill_ids.length > 0) {
-      const skills = skill_ids.map((skill_id) => ({
+    if (Array.isArray(skills) && skills.length > 0) {
+      const p_skills = skills.map((skill_id) => ({
         project_id: project.id,
         skill_id,
       }));
 
-      await ProjectSkill.bulkCreate(skills, { transaction });
+      await ProjectSkill.bulkCreate(p_skills, { transaction });
     }
 
     const projectUser = await ProjectUser.create(
@@ -82,10 +82,14 @@ const createProject = async (projectData) => {
   }
 };
 
-const getAllUserProjects = async (userId) => {
+const getAllUserProjects = async (userId, role = "owner") => {
   userId = Number(userId);
   if (!userId) throw new Error("userId is required");
 
+  let roleRecord = await Role.findOne({ where: { name: role } });
+  if (!roleRecord) {
+    throw new Error(`${role} doesn't exists`);
+  }
   const rows = await ProjectUser.findAll({
     where: { user_id: userId },
     attributes: [],
@@ -108,10 +112,16 @@ const getAllUserProjects = async (userId) => {
           },
         ],
       },
+      {
+        model: ProjectUserRole,
+        as: "project_user_roles",
+        where: { role_id: roleRecord.id },
+        attributes: ["id"],
+      },
     ],
   });
 
-  const projects = rows.map((row) => {
+  const projects = rows?.map((row) => {
     const p = row.project;
     return {
       id: p.id,
@@ -120,6 +130,7 @@ const getAllUserProjects = async (userId) => {
       status: p.status,
       location: p.location?.descriptions || null,
       skills: p.skills?.map((s) => s.name) || [],
+      role,
     };
   });
 
@@ -147,7 +158,25 @@ const getAllProjects = async () => {
   return projects;
 };
 
-const getProjectById = async (projectId) => {
+const getProjectById = async (projectId, userId = null) => {
+  let role = "viewer";
+
+  if (userId) {
+    const record = await ProjectUser.findOne({
+      where: { project_id: projectId, user_id: userId },
+      include: {
+        model: ProjectUserRole,
+        as: "project_user_roles",
+        attributes: ["id"],
+        include: {
+          model: Role,
+          as: "role",
+          attributes: ["name"],
+        },
+      },
+    });
+    if (record) role = record.project_user_roles[0].role.name;
+  }
   const project = await Project.findByPk(projectId, {
     include: [
       {
@@ -168,6 +197,55 @@ const getProjectById = async (projectId) => {
     throw new Error("Project not found");
   }
 
+  return { ...project.toJSON(), role };
+};
+
+const getProjectOwner = async (projectId) => {
+  if (!projectId) {
+    throw new Error("no project id given");
+  }
+
+  const ownerRole = await Role.findOne({
+    where: { name: "owner" },
+    attributes: ["id"],
+  });
+
+  if (!ownerRole) {
+    throw new Error("owner role not found");
+  }
+
+  const owner = await ProjectUser.findOne({
+    attributes: [],
+    where: { project_id: projectId },
+    include: [
+      {
+        model: ProjectUserRole,
+        as: "project_user_roles",
+        where: { role_id: ownerRole.id },
+        attributes: [],
+      },
+      {
+        model: User,
+        as: "user",
+        attributes: ["id", "name", "email"],
+      },
+    ],
+  });
+
+  if (!owner) {
+    throw new Error(`no owner found for project ${owner}`);
+  }
+
+  return owner ? owner.user : null;
+};
+
+const updateProject = async (projectId, updateData) => {
+  const project = await Project.findByPk(projectId);
+  if (!project) {
+    throw new Error("Project not found");
+  }
+
+  await project.update(updateData);
   return project;
 };
 
@@ -176,4 +254,6 @@ module.exports = {
   getAllUserProjects,
   getAllProjects,
   getProjectById,
+  getProjectOwner,
+  updateProject,
 };

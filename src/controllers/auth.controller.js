@@ -21,7 +21,7 @@ const signup = async (req, res, next) => {
   await client.set(email, JSON.stringify(data), "EX", otpExpMin * 60);
 
   // send email
-  await emailHelper.send(email, "OTP for Registration | Colearn", "signup-otp", {
+  emailHelper.send(email, "OTP for Registration | Colearn", "signup-otp", {
     username: name,
     otp,
     expiryMinutes: otpExpMin,

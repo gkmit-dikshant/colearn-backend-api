@@ -2,16 +2,19 @@ const express = require("express");
 const { projectController } = require("../controllers");
 const authMiddleware = require("../middlewares/auth.middleware");
 const rbacMiddleware = require("../middlewares/rbac.middleware");
+const optionalAuthMiddleware = require("../middlewares/optionalAuth.middleware");
 const router = express.Router();
 
-router.use(authMiddleware);
 router.post("/", authMiddleware, projectController.createProject);
-router.get("/me", projectController.getAllUserProjects);
-router.get("/", projectController.getAllProjects);
-router.get(
+router.patch(
   "/:projectId",
+  authMiddleware,
   rbacMiddleware.getProjectRole,
-  rbacMiddleware.protected("member", "owner"),
-  projectController.getProject
+  rbacMiddleware.protected("owner"),
+  projectController.updateProject
 );
+router.get("/me", authMiddleware, projectController.getAllUserProjects);
+router.get("/", optionalAuthMiddleware, projectController.getAllProjects);
+router.get("/:projectId", optionalAuthMiddleware, projectController.getProject);
+
 module.exports = router;
