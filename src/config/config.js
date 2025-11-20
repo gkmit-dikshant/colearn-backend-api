@@ -14,4 +14,10 @@ module.exports = {
     deletedAt: "deleted_at",
     paranoid: true,
   },
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
 };
