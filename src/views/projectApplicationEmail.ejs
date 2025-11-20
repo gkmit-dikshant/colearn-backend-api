@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>New Project Application</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f6f6f6;
+        padding: 20px;
+      }
+
+      .container {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 600px;
+        margin: auto;
+        box-shadow: 0 0 10px rgba(0,0,0,0.08);
+      }
+
+      .header {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+      }
+
+      .section {
+        margin-top: 15px;
+        padding: 12px 15px;
+        border-left: 4px solid #4a90e2;
+        background: #f0f6ff;
+        border-radius: 6px;
+      }
+
+      .label {
+        font-weight: bold;
+        margin-right: 5px;
+      }
+
+      .footer {
+        margin-top: 25px;
+        font-size: 14px;
+        color: #777;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        New Application for Your Project 🚀
+      </div>
+
+      <p>Hi <%= projectOwner.name %>,</p>
+
+      <p>
+        You’ve received a new application for your project:
+        <strong><%= project.title %></strong>.
+      </p>
+
+      <div class="section">
+        <p><span class="label">Project:</span> <%= project.title %></p>
+        <p><span class="label">Location:</span> <%= project.location.descriptions %></p>
+        <p><span class="label">Status:</span> <%= project.status %></p>
+      </div>
+
+      <div class="section">
+        <h4>Applicant Details</h4>
+        <p><span class="label">Name:</span> <%= applicant.name %></p>
+        <p><span class="label">Email:</span> <%= applicant.email %></p>
+
+        <% if (applicant.bio) { %>
+          <p><span class="label">Bio:</span> <%= applicant.bio %></p>
+        <% } %>
+      </div>
+
+      <div class="section">
+        <h4>Applicant Message</h4>
+        <p><%= message %></p>
+      </div>
+
+      <p>
+        You can log in to your dashboard to review the application and take action.
+      </p>
+
+      <div class="footer">
+        — Team Colearn
+      </div>
+    </div>
+  </body>
+</html>
