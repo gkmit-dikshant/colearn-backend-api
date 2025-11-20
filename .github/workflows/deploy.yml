@@ -6,8 +6,26 @@ on:
       - staging
 
 jobs:
+  trivy-sast:
+    name: Trivy SAST Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy SAST
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scanners: "secret,misconfig"
+          scan-ref: "."
+          exit-code: "1"
+          severity: "CRITICAL,HIGH"
+
   deploy:
     runs-on: ubuntu-latest
+    needs: trivy-sast
 
     steps:
       - name: Checkout code
