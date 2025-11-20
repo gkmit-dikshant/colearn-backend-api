@@ -9,8 +9,20 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      project_id: { type: Sequelize.INTEGER, allowNull: false, references: { model: "projects", key: "id" } },
-      skill_id: { type: Sequelize.INTEGER, allowNull: false, references: { model: "skills", key: "id" } },
+      project_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: { model: "projects", key: "id" },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      },
+      skill_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: { model: "skills", key: "id" },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE,

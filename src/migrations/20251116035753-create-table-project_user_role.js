@@ -16,6 +16,8 @@ module.exports = {
           model: "project_user_roles",
           key: "id",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       role_id: {
         type: Sequelize.INTEGER,
@@ -24,6 +26,8 @@ module.exports = {
           model: "roles",
           key: "id",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       created_at: {
         allowNull: false,

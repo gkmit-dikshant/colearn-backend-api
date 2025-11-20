@@ -9,8 +9,20 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      user_id: { type: Sequelize.INTEGER, allowNull: false, references: { model: "users", key: "id" } },
-      project_id: { type: Sequelize.INTEGER, allowNull: false, references: { model: "projects", key: "id" } },
+      user_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: { model: "users", key: "id" },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      },
+      project_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: { model: "projects", key: "id" },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      },
       status: { type: Sequelize.ENUM("pending", "accepted", "rejected"), defaultValue: "pending" },
       message: { type: Sequelize.TEXT, allowNull: false },
       created_at: {

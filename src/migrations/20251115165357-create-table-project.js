@@ -11,7 +11,13 @@ module.exports = {
       },
       title: { type: Sequelize.STRING(200), allowNull: false },
       description: { type: Sequelize.TEXT, allowNull: false },
-      location_id: { type: Sequelize.INTEGER, allowNull: false, references: {model: "locations", key: 'id'} },
+      location_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: { model: "locations", key: "id" },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      },
       status: { type: Sequelize.ENUM("active", "inactive"), defaultValue: "active" },
       created_at: {
         allowNull: false,

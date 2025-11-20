@@ -13,11 +13,15 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: "operations", key: "id" },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       resource_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: "resources", key: "id" },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       created_at: {
         allowNull: false,
