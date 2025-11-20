@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Application Accepted</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f6f6f6;
+        padding: 20px;
+      }
+
+      .container {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 600px;
+        margin: auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+      }
+
+      .header {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+      }
+
+      /* Changed border color to Green to signify Success/Approval */
+      .section {
+        margin-top: 15px;
+        padding: 12px 15px;
+        border-left: 4px solid #28a745;
+        background: #f0fff4;
+        border-radius: 6px;
+      }
+
+      .label {
+        font-weight: bold;
+        margin-right: 5px;
+        color: #555;
+      }
+
+      .btn {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+      }
+
+      .footer {
+        margin-top: 25px;
+        font-size: 14px;
+        color: #777;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">Application Accepted! 🎉</div>
+
+      <p>Hi <%= user.name %>,</p>
+
+      <p>
+        Great news! Your application to join the project
+        <strong><%= project.title %></strong> has been accepted.
+      </p>
+
+      <div class="section">
+        <h4>Project Details</h4>
+        <p><span class="label">Project:</span> <%= project.title %></p>
+        <p><span class="label">Location:</span> <%= project.location.descriptions %></p>
+        <p><span class="label">Status:</span> <%= project.status %></p>
+      </div>
+
+      <p>You have been added to the project team. You can now access the collaborative workspace.</p>
+      <div class="footer">— Team Colearn</div>
+    </div>
+  </body>
+</html>
