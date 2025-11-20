@@ -1,0 +1,24 @@
+name: Deploy to EC2
+
+on:
+  pull_request:
+    branches:
+      - staging
+
+jobs:
+  trivy-sast:
+    name: Trivy SAST Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy SAST
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          path: "."
+          scanners: "secret,config"
+          exit-code: 1
+          severity: "CRITICAL,HIGH"
