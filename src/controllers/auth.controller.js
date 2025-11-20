@@ -38,16 +38,10 @@ const verifyOtp = async (req, res, next) => {
 
   const user = JSON.parse(await client.get(email));
   if (!user) {
-    return res.status(401).json({
-      success: false,
-      message: "please signup first",
-    });
+    throw { statusCode: 400, message: "otp expired or invalid email" };
   }
   if (user.otp !== otp) {
-    return res.status(400).json({
-      success: false,
-      message: "invalid otp",
-    });
+    throw { statusCode: 400, message: "invalid otp" };
   }
 
   // delete cashe
@@ -91,10 +85,7 @@ const login = async (req, res, next) => {
     const user = await authService.login({ email, password });
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: `no user with email ${email}`,
-      });
+      throw { statusCode: 401, message: "invalid credentials" };
     }
     const accessToken = createJwtToken("access", { id: user.id, email });
     const refreshToken = createJwtToken("refresh", { id: user.id, email });
@@ -105,7 +96,7 @@ const login = async (req, res, next) => {
       refreshToken,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(error.statusCode || 400).json({
       success: false,
       message: error.message,
     });
@@ -116,24 +107,15 @@ const sendAccessToken = async (req, res, next) => {
   const { email, refreshToken } = req.body;
 
   if (!email) {
-    return res.status(400).json({
-      success: false,
-      message: "please provide email",
-    });
+    throw { statusCode: 400, message: "please provide email" };
   }
   if (!refreshToken) {
-    return res.status(400).json({
-      success: false,
-      message: "please provide password",
-    });
+    throw { statusCode: 400, message: "please provide refresh token" };
   }
 
   const currUser = verifyJwtToken("refresh", refreshToken);
   if (!currUser || currUser.email !== email) {
-    return res.status(401).json({
-      success: false,
-      message: "invalid refresh token, please login agian",
-    });
+    throw { statusCode: 401, message: "invalid refresh token" };
   }
 
   const accessToken = createJwtToken("access", currUser);

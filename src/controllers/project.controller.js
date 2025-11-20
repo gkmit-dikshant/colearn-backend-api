@@ -5,10 +5,7 @@ const createProject = async (req, res, next) => {
     const { title, description, location_id, status, skills } = req.body;
 
     if (!title || !description || !location_id) {
-      return res.status(400).json({
-        success: false,
-        message: "Title, description, and location_id are required",
-      });
+      throw { statusCode: 400, message: "title, description and location_id are required" };
     }
 
     const project = await projectService.createProject({
@@ -69,10 +66,7 @@ const getProject = async (req, res, next) => {
     const { projectId } = req.params;
 
     if (!projectId || isNaN(projectId)) {
-      return res.status(400).json({
-        success: false,
-        message: "Valid project ID is required",
-      });
+      return { statusCode: 400, message: "Valid project ID is required" };
     }
 
     const project = await projectService.getProjectById(parseInt(projectId), req.user?.id);
@@ -99,10 +93,7 @@ const updateProject = async (req, res, next) => {
     const { title, description, status, skills } = req.body;
 
     if (!projectId || isNaN(projectId)) {
-      return res.status(400).json({
-        success: false,
-        message: "Valid project ID is required",
-      });
+      return { statusCode: 400, message: "Valid project ID is required" };
     }
 
     if (!title && !description && !status && !skills) {

@@ -44,7 +44,7 @@ const updateStatus = async (req, res, next) => {
     const { status } = req.body; // "accepted" or "rejected"
 
     if (!["accepted", "rejected"].includes(status)) {
-      return res.status(400).json({ success: false, message: "Invalid status" });
+      throw { statusCode: 400, message: "Invalid status value" };
     }
 
     const application = await applicationService.updateStatus(applicationId, status);
