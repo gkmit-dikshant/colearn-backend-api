@@ -118,10 +118,36 @@ const updateProject = async (req, res, next) => {
   }
 };
 
+const getProjectMembers = async (req, res, next) => {
+  try {
+    const { projectId } = req.params;
+
+    if (!projectId || isNaN(projectId)) {
+      return { statusCode: 400, message: "Valid project ID is required" };
+    }
+
+    const members = await projectService.getProjectMembers(parseInt(projectId));
+
+    res.status(200).json({
+      success: true,
+      message: "Project members retrieved successfully",
+      members,
+      count: members.length,
+    });
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+      error,
+    });
+  }
+};
+
 module.exports = {
   createProject,
   getAllProjects,
   getAllUserProjects,
   getProject,
   updateProject,
+  getProjectMembers,
 };

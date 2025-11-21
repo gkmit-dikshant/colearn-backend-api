@@ -15,6 +15,13 @@ router.patch(
   createProjectValidation,
   projectController.updateProject
 );
+router.get(
+  "/:projectId/members",
+  authMiddleware,
+  rbacMiddleware.getProjectRole,
+  rbacMiddleware.protected("owner", "member"),
+  projectController.getProjectMembers
+);
 router.get("/me", authMiddleware, projectController.getAllUserProjects);
 router.get("/", optionalAuthMiddleware, projectController.getAllProjects);
 router.get("/:projectId", optionalAuthMiddleware, projectController.getProject);

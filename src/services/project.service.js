@@ -240,13 +240,103 @@ const getProjectOwner = async (projectId) => {
 };
 
 const updateProject = async (projectId, updateData) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const project = await Project.findByPk(projectId);
+    if (!project) {
+      throw { statusCode: 404, message: "Project not found" };
+    }
+
+    const { skills, ...projectFields } = updateData;
+
+    // --- Update project fields ---
+    await project.update(projectFields, { transaction });
+
+    // --- Update project skills ---
+    if (Array.isArray(skills)) {
+      // 1. Remove old skills
+      await ProjectSkill.destroy({
+        where: { project_id: projectId },
+        transaction,
+      });
+
+      // 2. Add new skills
+      if (skills.length > 0) {
+        const newSkills = skills.map((skill_id) => ({
+          project_id: projectId,
+          skill_id,
+        }));
+
+        await ProjectSkill.bulkCreate(newSkills, { transaction });
+      }
+    }
+
+    await transaction.commit();
+
+    // Return updated project with associated fields
+    const updatedProject = await Project.findByPk(projectId, {
+      include: [
+        {
+          model: Location,
+          as: "location",
+          attributes: ["id", "descriptions"],
+        },
+        {
+          model: Skill,
+          as: "skills",
+          attributes: ["id", "name"],
+          through: { attributes: [] },
+        },
+      ],
+    });
+
+    return updatedProject;
+  } catch (error) {
+    if (!transaction.finished) await transaction.rollback();
+    throw error;
+  }
+};
+
+const getProjectMembers = async (projectId) => {
   const project = await Project.findByPk(projectId);
   if (!project) {
     throw { statusCode: 404, message: "Project not found" };
   }
 
-  await project.update(updateData);
-  return project;
+  const members = await ProjectUser.findAll({
+    where: { project_id: projectId },
+    include: [
+      {
+        model: User,
+        as: "user",
+        attributes: ["id", "name", "email"],
+      },
+      {
+        model: ProjectUserRole,
+        as: "project_user_roles",
+        include: [
+          {
+            model: Role,
+            as: "role",
+            attributes: ["id", "name"],
+          },
+        ],
+        attributes: ["id"],
+      },
+    ],
+  });
+
+  const formattedMembers = members?.map((member) => ({
+    id: member.user.id,
+    name: member.user.name,
+    email: member.user.email,
+    role: member.project_user_roles[0].role?.name,
+    joined_at: member.created_at,
+  }));
+
+  return formattedMembers;
+  // return members;
 };
 
 module.exports = {
@@ -256,4 +346,5 @@ module.exports = {
   getProjectById,
   getProjectOwner,
   updateProject,
+  getProjectMembers,
 };
