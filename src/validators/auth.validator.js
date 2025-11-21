@@ -7,15 +7,16 @@ if (isNaN(otpLen) || otpLen < 4 || otpLen > 10) {
 
 const signupValidation = (req, res, next) => {
   const schema = Joi.object({
-    name: Joi.string().max(50).required().messages({
+    name: Joi.string().max(50).min(3).required().messages({
       "string.max": "Name must be a string up to 50 characters",
       "any.required": "Name is required",
+      "string.min": "Name must be a string of atleast 3 characters",
     }),
     email: Joi.string().email().required().messages({
       "string.email": "Invalid email",
       "any.required": "Email is required",
     }),
-    password: Joi.string().min(6).required().messages({
+    password: Joi.string().min(8).required().messages({
       "string.min": "Password must be at least 6 characters",
       "any.required": "Password is required",
     }),
