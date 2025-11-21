@@ -10,7 +10,7 @@ const signup = async (req, res, next) => {
   try {
     const existingUser = await userService.getUserDetailsByEmail(email);
     if (existingUser) {
-      throw { statusCode: 400, message: "user with this email already exists" };
+      throw { statusCode: 409, message: "user with this email already exists" };
     }
     // create otp
     const otp = createOtp();
@@ -50,7 +50,7 @@ const verifyOtp = async (req, res, next) => {
   try {
     const user = JSON.parse(await client.get(email));
     if (!user) {
-      throw { statusCode: 400, message: "otp expired or invalid email" };
+      throw { statusCode: 401, message: "otp expired or invalid email" };
     }
     if (user.otp !== otp) {
       throw { statusCode: 400, message: "invalid otp" };

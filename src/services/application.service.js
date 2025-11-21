@@ -30,7 +30,7 @@ const applyToProject = async (userId, projectId, message) => {
   });
 
   if (existing) {
-    throw { statusCode: 400, message: "You have already applied to this project" };
+    throw { statusCode: 409, message: "You have already applied to this project" };
   }
 
   return await Application.create({
