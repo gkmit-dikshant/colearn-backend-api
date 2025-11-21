@@ -4,10 +4,6 @@ const createProject = async (req, res, next) => {
   try {
     const { title, description, location_id, status, skills } = req.body;
 
-    if (!title || !description || !location_id) {
-      throw { statusCode: 400, message: "title, description and location_id are required" };
-    }
-
     const project = await projectService.createProject({
       title,
       owner_id: req.user.id,
@@ -23,7 +19,11 @@ const createProject = async (req, res, next) => {
       project,
     });
   } catch (error) {
-    next(error);
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+      error,
+    });
   }
 };
 
@@ -38,7 +38,11 @@ const getAllProjects = async (req, res, next) => {
       count: projects.length,
     });
   } catch (error) {
-    next(error);
+    return res.status(statusCode || 500).json({
+      success: false,
+      message: error.message,
+      error,
+    });
   }
 };
 
@@ -53,7 +57,7 @@ const getAllUserProjects = async (req, res, next) => {
       count: projects.length,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(error.statusCode || 500).json({
       success: false,
       message: error.message,
       error,
@@ -77,13 +81,10 @@ const getProject = async (req, res, next) => {
       project,
     });
   } catch (error) {
-    if (error.statusCode === 404) {
-      return res.status(404).json({
-        success: false,
-        message: error.message,
-      });
-    }
-    next(error);
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -94,13 +95,6 @@ const updateProject = async (req, res, next) => {
 
     if (!projectId || isNaN(projectId)) {
       return { statusCode: 400, message: "Valid project ID is required" };
-    }
-
-    if (!title && !description && !status && !skills) {
-      return res.status(400).json({
-        success: false,
-        message: "At least one field (title, description, status, skills) must be provided for update",
-      });
     }
 
     const updatedProject = await projectService.updateProject(parseInt(projectId), {
@@ -116,7 +110,7 @@ const updateProject = async (req, res, next) => {
       project: updatedProject,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(error.statusCode || 500).json({
       success: false,
       message: error.message,
       error,

@@ -23,7 +23,7 @@ const applyToProject = async (req, res, next) => {
       application,
     });
   } catch (error) {
-    return res.status(400).json({ success: false, message: error.message });
+    return res.status(error.statusCode || 500).json({ success: false, message: error.message });
   }
 };
 
@@ -34,7 +34,7 @@ const getProjectApplications = async (req, res, next) => {
 
     return res.json({ success: true, applications });
   } catch (error) {
-    return res.status(400).json({ success: false, message: error.message });
+    return res.status(error.statusCode || 500).json({ success: false, message: error.message });
   }
 };
 
@@ -64,7 +64,7 @@ const updateStatus = async (req, res, next) => {
       // application,
     });
   } catch (error) {
-    return res.status(400).json({ success: false, message: error.message });
+    return res.status(error.statusCode || 500).json({ success: false, message: error.message });
   }
 };
 
@@ -75,7 +75,7 @@ const getMyApplications = async (req, res, next) => {
 
     return res.json({ success: true, applications });
   } catch (error) {
-    return res.status(400).json({ success: false, message: error.message });
+    return res.status(error.statusCode || 500).json({ success: false, message: error.message });
   }
 };
 
