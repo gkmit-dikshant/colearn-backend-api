@@ -47,7 +47,7 @@ const createProject = async (projectData) => {
       transaction,
     });
 
-    if (!ownerRole) throw new Error("Owner role not seeded");
+    if (!ownerRole) throw { statusCode: 500, message: "owner role not found" };
 
     await ProjectUserRole.create(
       {
@@ -84,11 +84,11 @@ const createProject = async (projectData) => {
 
 const getAllUserProjects = async (userId, role = "owner") => {
   userId = Number(userId);
-  if (!userId) throw new Error("userId is required");
+  if (!userId) throw { statusCode: 400, message: "userId is required" };
 
   let roleRecord = await Role.findOne({ where: { name: role } });
   if (!roleRecord) {
-    throw new Error(`${role} doesn't exists`);
+    throw { statusCode: 400, message: `role ${role} not found` };
   }
   const rows = await ProjectUser.findAll({
     where: { user_id: userId },
@@ -194,7 +194,7 @@ const getProjectById = async (projectId, userId = null) => {
   });
 
   if (!project) {
-    throw new Error("Project not found");
+    throw { statusCode: 404, message: "Project not found" };
   }
 
   return { ...project.toJSON(), role };
@@ -202,7 +202,7 @@ const getProjectById = async (projectId, userId = null) => {
 
 const getProjectOwner = async (projectId) => {
   if (!projectId) {
-    throw new Error("no project id given");
+    throw { statusCode: 400, message: "projectId is required" };
   }
 
   const ownerRole = await Role.findOne({
@@ -211,7 +211,7 @@ const getProjectOwner = async (projectId) => {
   });
 
   if (!ownerRole) {
-    throw new Error("owner role not found");
+    throw { statusCode: 500, message: "owner role not found" };
   }
 
   const owner = await ProjectUser.findOne({
@@ -233,7 +233,7 @@ const getProjectOwner = async (projectId) => {
   });
 
   if (!owner) {
-    throw new Error(`no owner found for project ${owner}`);
+    throw { statusCode: 404, message: "Owner not found for the project" };
   }
 
   return owner ? owner.user : null;
@@ -242,7 +242,7 @@ const getProjectOwner = async (projectId) => {
 const updateProject = async (projectId, updateData) => {
   const project = await Project.findByPk(projectId);
   if (!project) {
-    throw new Error("Project not found");
+    throw { statusCode: 404, message: "Project not found" };
   }
 
   await project.update(updateData);

@@ -22,7 +22,7 @@ const applyToProject = async (userId, projectId, message) => {
   });
 
   if (owner) {
-    throw new Error("You cannot apply to your own project");
+    throw { statusCode: 400, message: "Project owners cannot apply to their own projects" };
   }
 
   const existing = await Application.findOne({
@@ -30,7 +30,7 @@ const applyToProject = async (userId, projectId, message) => {
   });
 
   if (existing) {
-    throw new Error("You have already applied to this project");
+    throw { statusCode: 409, message: "You have already applied to this project" };
   }
 
   return await Application.create({
@@ -58,7 +58,7 @@ const updateStatus = async (applicationId, status) => {
   const application = await Application.findByPk(applicationId);
 
   if (!application) {
-    throw new Error("Application not found");
+    throw { statusCode: 404, message: "Application not found" };
   }
 
   application.status = status;
