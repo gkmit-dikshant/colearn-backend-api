@@ -2,11 +2,18 @@ const express = require("express");
 const authMiddleware = require("../middlewares/auth.middleware");
 const { getProjectRole, protected } = require("../middlewares/rbac.middleware");
 const { applicationController } = require("../controllers");
+const { createApplicationValidation } = require("../validators/application.validator");
 
 const router = express.Router();
 
 router.use(authMiddleware);
-router.post("/projects/:projectId", getProjectRole, protected("viewer"), applicationController.applyToProject);
+router.post(
+  "/projects/:projectId",
+  getProjectRole,
+  protected("viewer"),
+  createApplicationValidation,
+  applicationController.applyToProject
+);
 router.get("/projects/:projectId", getProjectRole, protected("owner"), applicationController.getProjectApplications);
 router.post(
   "/projects/:projectId/status/:applicationId",
