@@ -25,6 +25,9 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "ProjectUserRole",
       tableName: "project_user_roles",
+      defaultScope: {
+        attributes: { exclude: ["deleted_at"] },
+      },
     }
   );
   return ProjectUserRole;

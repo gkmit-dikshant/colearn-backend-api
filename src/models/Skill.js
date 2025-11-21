@@ -25,6 +25,9 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "Skill",
       tableName: "skills",
+      defaultScope: {
+        attributes: { exclude: ["deleted_at"] },
+      },
     }
   );
   return Skill;
