@@ -91,7 +91,7 @@ const getProject = async (req, res, next) => {
 const updateProject = async (req, res, next) => {
   try {
     const { projectId } = req.params;
-    const { title, description, status, skills } = req.body;
+    const { title, description, status, skills, location_id } = req.body;
 
     if (!projectId || isNaN(projectId)) {
       return { statusCode: 400, message: "Valid project ID is required" };
@@ -102,6 +102,7 @@ const updateProject = async (req, res, next) => {
       description,
       status,
       skills,
+      location_id,
     });
 
     res.status(200).json({
